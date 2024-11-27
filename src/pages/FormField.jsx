@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import { Link } from 'react-router-dom';
+import GlobalContext from '../contexts/GlobalContext'
+
+
 
 export default function FormField() {
     const [formData, setFormData] = useState({
@@ -10,6 +13,9 @@ export default function FormField() {
         tags: [],
         pubblicato: false
     })
+    //accediamo al valore di Url_api
+    const { Url_api } = useContext(GlobalContext)
+
 
     //handle title imput
     function handleTitle(e) {
@@ -49,8 +55,10 @@ export default function FormField() {
         //reset of title after submit
         setFormData({ title: '', image: '', content: '', categoria: '', tags: [], pubblicato: false })
 
+        //make the consume of the context 
+
         //make a post request to the api serve  and pass over the newItem object to the SetArticoli state setter
-        fetch('http://localhost:3001/posts', {
+        fetch(`${Url_api}/posts`, {
             method: 'POST',
             body: JSON.stringify(formData),
             headers: {

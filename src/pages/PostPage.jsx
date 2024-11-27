@@ -1,5 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react";
+//import the use context
+import { useEffect, useState, useContext } from "react";
+import GlobalContext from '../contexts/GlobalContext'
 
 export default function PostPage() {
 
@@ -7,7 +9,10 @@ export default function PostPage() {
     const [post, setPost] = useState(null);
 
     const { slug } = useParams();
-    const url = `http://localhost:3001/posts/${slug}`
+    const { Url_api } = useContext(GlobalContext)
+
+
+    const url = `${Url_api}/posts/${slug}`
 
 
     useEffect(() => {
@@ -31,6 +36,7 @@ export default function PostPage() {
     },
         [])
 
+
     return (
 
         <>
@@ -39,7 +45,7 @@ export default function PostPage() {
                 post ? (
                     <div>
                         <div className="card" style={{ width: '40rem' }}>
-                            <img src={`http://localhost:3001/${post.image}`} className="card-img-top" alt="..." />
+                            <img src={`${Url_api}/${post.image}`} className="card-img-top" alt="..." />
                             <div className="card-body">
                                 <h5 className="card-title">{post.title}</h5>
                                 <h6 className="card-subtitle mb-2 text-muted ">{post.tags}</h6>

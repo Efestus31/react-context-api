@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom';
+import GlobalContext from '../contexts/GlobalContext'
 
 
 
 
 export default function Posts() {
     const [postsData, setPostsData] = useState({})
+    const { Url_api } = useContext(GlobalContext)
 
-
-    function fetchData(url = "http://localhost:3001/posts") {
+    function fetchData(url = `${Url_api}/posts`) {
         fetch(url)
             .then(resp => resp.json())
             .then(data => {
@@ -41,7 +42,7 @@ export default function Posts() {
                                                 {post.title}
                                             </h3>
                                             <Link to={`/posts/${post.slug}`}>
-                                                <img src={'http://localhost:3001/' + post.image} alt={post.title} style={{ width: '100%', height: '10rem', aspectRatio: '1' }} />
+                                                <img src={`${Url_api}/` + post.image} alt={post.title} style={{ width: '100%', height: '10rem', aspectRatio: '1' }} />
                                             </Link>
 
                                         </div>
