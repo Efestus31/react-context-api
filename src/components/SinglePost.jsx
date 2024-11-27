@@ -12,17 +12,16 @@ export default function SinglePost() {
     const [post, setPost] = useState(null);
 
     const { slug } = useParams();
-    const { Url_api } = useContext(GlobalContext)
+    const { postData } = useContext(GlobalContext)
 
 
-    const url = `${Url_api}/posts/${slug}`
+    const url = `http://localhost:3001/posts/${slug}`
 
 
     useEffect(() => {
         fetch(url)
             .then(res => res.json())
             .then(data => {
-                console.log(data);
 
                 const error = Object.keys(data)
                 if (error.includes('error')) {
@@ -41,7 +40,7 @@ export default function SinglePost() {
                 post ? (
                     <div>
                         <div className="card" style={{ width: '40rem' }}>
-                            <img src={`${Url_api}/${post.image}`} className="card-img-top" alt="..." />
+                            <img src={`http://localhost:3001/${post.image}`} className="card-img-top" alt="..." />
                             <div className="card-body">
                                 <h5 className="card-title">{post.title}</h5>
                                 <h6 className="card-subtitle mb-2 text-muted ">{post.tags}</h6>

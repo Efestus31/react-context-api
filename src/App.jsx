@@ -1,11 +1,11 @@
-import { useState, } from 'react'
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import About from './pages/About'
 import Posts from './pages/Posts'
 import FormField from './pages/FormField'
-import GlobalContext from './contexts/GlobalContext'
+import GlobalContext, { GlobalProvider } from './contexts/GlobalContext'
 import DefaultLayout from './pages/DefaultLayout'
 import PostPage from './pages/PostPage'
 import NotFound from './pages/NotFound'
@@ -14,24 +14,9 @@ import NotFound from './pages/NotFound'
 
 function App() {
 
-  const [formData, setFormData] = useState({
-    titolo: '',
-    immagine: '',
-    contenuto: '',
-    categoria: '',
-    tags: [],
-    pubblicato: false
-  })
-  const [newPost, setNewPost] = useState({})
-
-  //const [postsData, setPostsData
-  const [postsData, setPostsData] = useState({})
-
-  const Url_api = 'http://localhost:3001'
-
   return (
     <>
-      <GlobalContext.Provider value={{ Url_api }}>
+      <GlobalProvider>
         <BrowserRouter>
           <Routes>
             <Route element={<DefaultLayout />}>
@@ -45,7 +30,7 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter >
-      </GlobalContext.Provider>
+      </GlobalProvider>
     </>
   )
 }

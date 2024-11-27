@@ -1,206 +1,171 @@
-import { useState, useContext } from 'react'
-import GlobalContext from '../contexts/GlobalContext'
+import { useState, useContext, useEffect } from 'react';
+import GlobalContext from '../contexts/GlobalContext';
 
-
+const initialFormData = {
+    title: '',
+    image: '',
+    slug: '',
+    content: '',
+    tags: [],
+    pubblicato: false
+};
 
 export default function Form() {
-
-    const [formData, setFormData] = useState({
-        titolo: '',
-        immagine: '',
-        contenuto: '',
-        categoria: '',
-        tags: [],
-        pubblicato: false
-    })
-    //accediamo al valore di Url_api
-    const { Url_api } = useContext(GlobalContext)
+    const [formData, setFormData] = useState(initialFormData);
 
 
-    //handle title imput
+    // Funzione per generare lo slug dal titolo
+    function generateSlug(title) {
+        return title
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '');
+    }
+
+    // Funzione per gestire il cambiamento del titolo
     function handleTitle(e) {
-        setFormData({ ...formData, titolo: e.target.value })
+        const title = e.target.value;
+        setFormData(prevData => {
+            const newSlug = generateSlug(title);
+            return { ...prevData, title: title, slug: newSlug };
+        });
     }
-    //handle image
+
+    // Funzione per gestire l'immagine
     function handleImage(e) {
-        setFormData({ ...formData, immagine: e.target.files[0] });
+        setFormData(prevData => ({
+            ...prevData,
+            image: e.target.value
+        }));
     }
-    //handle content imput
+
+    // Funzione per gestire il contenuto dell'articolo
     function handleContent(e) {
-        setFormData({ ...formData, contenuto: e.target.value })
+        setFormData(prevData => ({
+            ...prevData,
+            content: e.target.value
+        }));
     }
-    //handle form imput
-    function handleCategory(e) {
-        setFormData({ ...formData, categoria: e.target.value })
-    }
-    //handle tags
+
+    // Funzione per gestire i tag
     function handleTags(e) {
-        const { value, checked } = e.target
-        setFormData((prevData) => {
+        const { value, checked } = e.target;
+        setFormData(prevData => {
             const newTags = checked
                 ? [...prevData.tags, value]
-                : prevData.tags.filter((tag) => tag !== value)
-            return { ...prevData, tags: newTags }
-        })
+                : prevData.tags.filter(tag => tag !== value);
+            return { ...prevData, tags: newTags };
+        });
     }
-    //handle publish
+
+    // Funzione per gestire la pubblicazione
     function handlePublish(e) {
-        setFormData({ ...formData, pubblicato: e.target.checked })
+        setFormData(prevData => ({
+            ...prevData,
+            pubblicato: e.target.checked
+        }));
     }
 
+    // Funzione per gestire il submit del form
     function handleSubmit(e) {
-        e.preventDefault()
-        // console.log(formData);
-        //setArticoli([...articoli, formData]);
-        //reset of title after submit
-        setFormData({ title: '', image: '', content: '', categoria: '', tags: [], pubblicato: false })
+        e.preventDefault();
+        // Reset dei campi dopo invio
+        setFormData(initialFormData);
 
-        //make the consume of the context 
-
-        //make a post request to the api serve  and pass over the newItem object to the SetArticoli state setter
-        fetch(`${Url_api}/posts`, {
+        // Chiamata POST per inviare i dati al server
+        fetch(`http://localhost:3001/posts`, {
             method: 'POST',
             body: JSON.stringify(formData),
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-            .then((res) => res.json())
-            .then(response => {
-                setArticoli([...articoli, response]);
+            .then(res => res.json())
+            .then(res => {
+                console.log('Post submitted successfully:', res);
             })
 
+            .catch(error => {
+                console.error('Error submitting post:', error);
+            });
     }
 
     return (
         <>
-            <form className="row g-3" onSubmit={handleSubmit} >
+            <form className="row g-3" onSubmit={handleSubmit}>
 
                 {/* Title */}
                 <div className="col-12">
-                    <label htmlFor="task" className="form-label">Titolo articolo </label>
+                    <label htmlFor="title" className="form-label">Titolo articolo </label>
                     <input
                         type="text"
-                        id='titolo'
-                        value={formData.titolo}
+                        id="title"
+                        value={formData.title || ''}  // Usa una stringa vuota come fallback
                         onChange={handleTitle}
                         className="form-control"
                         placeholder="Inserisci il titolo dell'articolo"
                     />
                 </div>
 
-                {/* image */}
+                {/* Image */}
                 <div className="col-12">
-                    <label htmlFor="task" className="form-label">Immagine articolo  </label>
+                    <label htmlFor="image" className="form-label">Immagine articolo </label>
                     <input
-                        type="file"
+                        type="text"
                         className="form-control"
-                        id="immagineArticolo"
+                        id="image"
+                        value={formData.image || ''}
                         onChange={handleImage}
-                        accept="image/*"
+                        placeholder="https://picsum.photos/200/300"
                     />
                 </div>
 
-                {/* text area */}
+                {/* Content */}
                 <div className="col-12">
-
-                    <label htmlFor="contenuto" className='form-label'>Contenuto articolo:</label>
+                    <label htmlFor="content" className="form-label">Contenuto articolo:</label>
                     <textarea
-                        id='contenuto'
-                        value={formData.contenuto}
+                        id="content"
+                        value={formData.content || ''}  // Usa una stringa vuota come fallback
                         onChange={handleContent}
                         className="form-control"
                         placeholder="Scrivi il contenuto dell'articolo"
                         rows="5"
                     />
                 </div>
-                {/* select */}
-                <div className="col-12">
-                    <label className="input-group-text" htmlFor="inputGroupCategory">Categorie</label>
-                    <select
-                        id='categoria'
-                        value={formData.categoria}
-                        onChange={handleCategory}
-                        className="form-select"
-                    >
-                        <option value="">Scegli la categoria:</option>
-                        <option value="1">Tecnologia</option>
-                        <option value="2">Lifestyle</option>
-                        <option value="3">Educazione</option>
-                        <option value="4">Cucina e Ricette</option>
-                        <option value="5">Business e Finanza</option>
-                    </select>
-                </div>
-                {/* checkbox */}
+
+                {/* Tags */}
                 <div className="col-12">
                     <label htmlFor="tags">Tags:</label>
-                    <label>
-                        <input
-                            className="form-check-input mt-0"
-                            type="checkbox"
-                            value="Innovazione"
-                            checked={formData.tags.includes('Innovazione')}
-                            onChange={handleTags}
-                            aria-label="Innovazione"
-                        /> Innovazione
-                    </label>
-                    <label>
-                        <input
-                            className="form-check-input mt-0"
-                            type="checkbox"
-                            value="Benessere"
-                            checked={formData.tags.includes('Benessere')}
-                            onChange={handleTags}
-                            aria-label="Benessere"
-                        /> Benessere
-                    </label>
-                    <label>
-                        <input
-                            className="form-check-input mt-0"
-                            type="checkbox"
-                            value="Educazione"
-                            checked={formData.tags.includes('Educazione')}
-                            onChange={handleTags}
-                            aria-label="Educazione"
-                        /> Educazione
-                    </label>
-                    <label>
-                        <input
-                            className="form-check-input mt-0"
-                            type="checkbox"
-                            value="RicetteFacili"
-                            checked={formData.tags.includes('RicetteFacili')}
-                            onChange={handleTags}
-                            aria-label="RicetteFacili"
-                        /> RicetteFacili
-                    </label>
-                    <label>
-                        <input
-                            className="form-check-input mt-0"
-                            type="checkbox"
-                            value="Startup"
-                            checked={formData.tags.includes('Startup')}
-                            onChange={handleTags}
-                            aria-label="Startup"
-                        /> Startup
-                    </label>
+                    {['Dolci', 'Torte', 'Ricette vegetariane', 'RicetteFacili', 'Ricette al forno', 'Antipasti', 'Primi piatti'].map(tag => (
+                        <label key={tag}>
+                            <input
+                                className="form-check-input mt-0 mx-2"
+                                type="checkbox"
+                                value={tag}
+                                checked={formData.tags.includes(tag)}
+                                onChange={handleTags}
+                                aria-label={tag}
+                            /> {tag}
+                        </label>
+                    ))}
                 </div>
 
-                {/* publish */}
+                {/* Publish */}
                 <div className="input-group mb-3">
                     <input
                         type="checkbox"
                         checked={formData.pubblicato}
                         onChange={handlePublish}
-                        className="form-check-input mt-0"
-                        id="pubblicato" />
+                        className="form-check-input mt-0 mx-2"
+                        id="pubblicato"
+                    />
                     Pubblicato
                 </div>
 
                 {/* Submit */}
                 <button type="submit">Aggiungi Articolo</button>
             </form>
-
         </>
-    )
+    );
 }
