@@ -21,13 +21,6 @@ export default function PostCard() {
         fetchData()
     }, [])
 
-
-
-
-
-
-
-
     return (
         <>
             {
@@ -41,10 +34,8 @@ export default function PostCard() {
                                 <Link to={`/posts/${post.slug}`}>
                                     <img src={`${Url_api}/` + post.image} alt={post.title} style={{ width: '100%', height: '10rem', aspectRatio: '1' }} />
                                 </Link>
-
                             </div>
                             <div className='border border-gray-400 p-2'>
-
                                 {post.content}
                             </div>
 
